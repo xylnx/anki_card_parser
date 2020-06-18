@@ -41,42 +41,55 @@ soup = BeautifulSoup(html, "html.parser")
 # Clean up html #
 ################
 
-# List classes to be removed
-REMOVE_ATTRIBUTES = [
-  'class', 'alt'
-]
-
 # List tags for removal
 REMOVE_TAGS = ['h1', 'h2', 'hr']
+# List classes to be removed
+REMOVE_ATTRIBUTES = ['class', 'alt']
+# List quotation marks to be replace with html entity
+QUOT_SYMBOLS= ['„', '“', '"']
 
-# Remove classes
-for attribute in REMOVE_ATTRIBUTES:
-  for tag in soup.find_all(attrs={attribute: True}):
-    del tag[attribute]
+# Remove attributes
+def remove_attrs(attrs):
+  for attribute in attrs:
+    for tag in soup.find_all(attrs={attribute: True}):
+      del tag[attribute]
 
-# Remove tags
-for item in REMOVE_TAGS:
-  for tag in soup.select(item):
-    tag.extract()
+def remove_tags(tags):
+  for tag in tags:
+    for tag in soup.select(tag):
+      tag.extract()
 
+# Replace strings in the whole file
+def replace_strings(string_array, replacement_str):
+  for str in string_array:
+    # Find strings
+    result = soup.find_all(string=re.compile(str))
+    # Replace strings
+    for item in result:
+      new_str= item.replace(str, replacement_str)
+      item.replace_with(new_str)
 
-# Replace quotation marks with html entity
-quot_symbols= ['„', '“', '"']
+# Replace strings in a subset made from particular tags
+def replace_strings_sub(strg, replacement_str, tag):
+    result = soup.find_all(tag)
+    # Replace strings
+    for item in result:
+      print(item)
+      new_str= str(item).replace(strg, replacement_str)
+      item.replace_with(new_str)
+      # print(new_str)
 
-for quot_symbol in quot_symbols:
-  # Find quotation marks
-  result= soup.find_all(string=re.compile(quot_symbol))
+def clean_html():
+  # Remove unnecessary html tags and attributes
+  remove_tags(REMOVE_TAGS)
+  remove_attrs(REMOVE_ATTRIBUTES)
   # Replace quotation marks with html entity
-  for item in result:
-    new_item= item.replace(quot_symbol, '&quot;')
-    item.replace_with(new_item)
+  replace_strings(QUOT_SYMBOLS, '&quot;')
+  # Replace double quotes with single quotes in image src attributes
+  # Double quotes cause errors when importing to Anki
+  replace_strings_sub('"',"'","img")
 
-# Replace double quotes with single quotes in attributes
-# Double quotes cause errors when importing to Anki
-imgs= soup.find_all('img')
-for img in imgs:
-  new_img = str(img).replace('"', "'")
-  img.replace_with(new_img)
+clean_html()
 
 
 #####################################################
