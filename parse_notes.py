@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
 import markdown
 import htmlmin
 from bs4 import BeautifulSoup
@@ -9,9 +8,9 @@ import sys, getopt
 import re
 import time
 
+# HANDLE ARGUMENTS
 # print('Number of arguments:', len(sys.argv), 'arguments.')
 # print('Argument List:', str(sys.argv))
-
 file_path= str(sys.argv[1])
 input_file= str(sys.argv[2])
 export_file= input_file.split('.')[0] + '.html'
@@ -20,24 +19,19 @@ export_file= input_file.split('.')[0] + '.html'
 md_input= file_path + '/' + input_file
 html_output= file_path + '/' + export_file
 
-# Define constant to signal end of a question field
+# Define constants to signal begin and end of a question 
 BEGINN_QUESTION = 'h3'
 END_QUESTION = '%eq'
 
-# List classes to be removed
-REMOVE_ATTRIBUTES = [
-  'class', 'alt'
-]
-
 # Count questions
-qestion_count = 0
+question_count = 0
 
 # Open markdown file
 with open(md_input, "r", encoding="utf-8") as input_file:
-    text = input_file.read()
+    markd = input_file.read()
 
 # Parse markdown
-html = markdown.markdown(text, extensions=['fenced_code'])
+html = markdown.markdown(markd, extensions=['fenced_code'])
 
 # Parse html
 soup = BeautifulSoup(html, "html.parser")
@@ -47,36 +41,43 @@ soup = BeautifulSoup(html, "html.parser")
 # Clean up html #
 ################
 
-# Delete tags
-tags = ['h1', 'h2', 'hr']
-for item in tags:
-  for tag in soup.select(item):
-    tag.extract()
+# List classes to be removed
+REMOVE_ATTRIBUTES = [
+  'class', 'alt'
+]
+
+# List tags for removal
+REMOVE_TAGS = ['h1', 'h2', 'hr']
 
 # Remove classes
 for attribute in REMOVE_ATTRIBUTES:
   for tag in soup.find_all(attrs={attribute: True}):
     del tag[attribute]
 
+# Remove tags
+for item in REMOVE_TAGS:
+  for tag in soup.select(item):
+    tag.extract()
+
+
 # Replace quotation marks with html entity
 quot_symbols= ['„', '“', '"']
 
 for quot_symbol in quot_symbols:
+  # Find quotation marks
   result= soup.find_all(string=re.compile(quot_symbol))
-
+  # Replace quotation marks with html entity
   for item in result:
     new_item= item.replace(quot_symbol, '&quot;')
     item.replace_with(new_item)
 
-# Replace tabs with spaces
-# tabs= ['	']
+# Replace double quotes with single quotes in attributes
+# Double quotes cause errors when importing to Anki
+imgs= soup.find_all('img')
+for img in imgs:
+  new_img = str(img).replace('"', "'")
+  img.replace_with(new_img)
 
-# for tab in tabs:
-#   result= soup.find_all(string=re.compile(tab))
-
-#   for item in result:
-#     new_item= item.replace(tab, '  ')
-#     item.replace_with(new_item)
 
 #####################################################
 # Format html so it can be read by Anki's importer #
@@ -119,8 +120,8 @@ for begin_tag in begin_tags:
   
   if (not is_end_tag):
     begin_tag.insert_after('"\t"')
-    print('insert after begin_tag')
-    qestion_count += 1
+    # Increment no of questions
+    question_count += 1
   
   is_end_tag = False
 
@@ -143,7 +144,7 @@ for begin_tag in begin_tags[1:]:
 for end_tag in end_tags:
   end_tag.insert_before('"\t"')
   # Increment no of questions
-  qestion_count += 1
+  question_count += 1
 
   # Remove end of question identifier
   end_tag.extract()
@@ -218,7 +219,7 @@ os.system('cd ' + file_path + ' && cp *.jpg /Users/jep/Library/Application\ Supp
 # Print number of questions
 print('#########################')
 
-print('# No. of questions: ' + str(qestion_count) + ' #')
+print('# No. of questions: ' + str(question_count) + ' #')
 
 print('#########################')
 
