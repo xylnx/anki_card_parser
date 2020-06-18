@@ -74,7 +74,6 @@ def replace_strings_sub(strg, replacement_str, tag):
     result = soup.find_all(tag)
     # Replace strings
     for item in result:
-      print(item)
       new_str= str(item).replace(strg, replacement_str)
       item.replace_with(new_str)
       # print(new_str)
@@ -91,17 +90,16 @@ def clean_html():
 
 clean_html()
 
-
-#####################################################
-# Format html so it can be read by Anki's importer #
-###################################################
+#######################################################################
+# Format quesetions and answers so it can be read by Anki's importer #
+#####################################################################
 
 # Ankis importer reads text files and excepts HTML in them.
 # Here we use a simple card layout: 2 Fields --> front (question) and back (answer)
 # Anki distinguishes fields through a separator (semicolon, comma etc.)
 # Here we use a tab as separator
-# A new line is needed to signal the beginning of a new card
-# Every question and every answer is wrapped in quotes
+# Also: A new line is needed to signal the beginning of a new card
+# And: Every question and every answer is wrapped in quotes
 # This allows for multi line questions and answers (and new lines in questions and answers, which would otherwise be identified as beginnings of new cards)
 
 
@@ -118,7 +116,7 @@ begin_tags = soup.find_all(BEGINN_QUESTION)
 
 # Determine if there is an end_tag in between two begin_tags
 # If true: no action required
-# False : insert answer and question separator directly after begin_tag
+# False : insert answer/question-separator directly after begin_tag
 is_end_tag = False
 
 for begin_tag in begin_tags:
@@ -178,44 +176,9 @@ t.insert_after('"')
 
 
 
-    
-
-# if (tags[-1].name == 'code'):
-#   pass
-
-# tags[-1].insert_after('"')
-
-
-
-# Identify the end of an answer and beginning of a question
-# add quotation mark to identify the end of an answer
-# add new line before h3 openeing tags to identify beginn next question
-# Do this except for first h3 tag (first question has no previous answer)
-
-
-
-# Workaround for multiple choice questions
-##########################################
-# h4_tags = soup.find_all('h4')
-
-# for h4 in h4_tags:
-#   h4.insert_before('"\n')
-
-# # Use string to identify the end of question, instead of closing tag
-# end_of_question_tags = soup.find_all('p', string=END_QUESTION)
-
-# # Insert a tab after end of question identifier (<p>%eq</p> ->)
-# # Add quotation mark to identify begin answer (<p>%eq</p> ->")
-# for end_of_question_tag in end_of_question_tags:
-#   end_of_question_tag.insert_after('\t"')
-#   # Remove end of question identifier (->")
-#   end_of_question_tag.extract()
-  
-#   # Increment qestion_count (to count no of questions)
-#   qestion_count += 1
-
-###################################
-###################################
+  #######################
+ # save file           #
+########################
 
 ## Write anki optimized soup to file
 with open(html_output, "w", encoding="utf-8", errors="xmlcharrefreplace") as output_file:
