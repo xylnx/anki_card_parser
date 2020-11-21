@@ -8,12 +8,21 @@ import sys, getopt
 import re
 import time
 
+# Anki's library folder
+ANKI_LIB_DIR='/home/xy/.local/share/Anki2/User\ 1/collection.media'
+
+# Image folder location
+IMG_DIR='/img/'
+
+# HTML folder location
+HTML_DIR='/html/'
+
 # HANDLE ARGUMENTS
 # print('Number of arguments:', len(sys.argv), 'arguments.')
 # print('Argument List:', str(sys.argv))
 file_path= str(sys.argv[1])
 input_file= str(sys.argv[2])
-export_file= input_file.split('.')[0] + '.html'
+export_file= HTML_DIR + input_file.split('.')[0] + '.html'
 
 # Name input and output files
 md_input= file_path + '/' + input_file
@@ -166,14 +175,15 @@ tags = soup.findAll()
 # get last html element
 t = tags[-1]
 
+# Find last closing tag
 # Problem: html elements are nested
-# Solution: get last parent of last element before root
+# Thus: the last closing tag might actually be the penultimate tag
+# Solution: get last parent of last element before the root
 while (t.parent.name != "[document]"):
   t = t.parent
 
 # insert quote after last parent of last element
 t.insert_after('"')
-
 
 
   #######################
@@ -185,7 +195,7 @@ with open(html_output, "w", encoding="utf-8", errors="xmlcharrefreplace") as out
   output_file.write(soup.decode(formatter=None))
 
 # Copy all image files to Anki
-os.system('cd ' + file_path + ' && cp *.jpg /Users/jep/Library/Application\ Support/Anki2/User\ 1/collection.media/')
+os.system('cd ' + file_path + IMG_DIR + ' && cp *.jpg ' +  ANKI_LIB_DIR)
 
 
 # Print content of tags
