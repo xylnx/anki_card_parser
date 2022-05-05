@@ -4,11 +4,22 @@ A python script to parse markdown as basic [Anki](https://apps.ankiweb.net/) fla
 
 ![](readme_imgs/flashcard_example.png)
 
-## Why
+## Table of Contents
+
+- [Why this script exists](#why-this-script-exists)
+- [How it works](#how-it-works)
+  - [Multiline questions](#multiline-questions)
+  - [Images](#images)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Usage](#usage)
+
+## Why this script exists
 
 The Anki importer understands html. However, text has to be formated in a specific way. this is necessary to make the importer understand which parts should go on the front and which on the back side of a flashcard. E g. questions and answers have to be wrapped in quotation marks. The importer also requires certain markers signaling the beginning and end of a question.
 
-## How
+## How it works
 
 `Anki Card Parser` assumes your flash cards have a front side containing a question, and a back side containing the answer to that question (cp. screenshot above). It uses an `<h3>` tag as a marker for the begining of a new card. So you can write your markdown like so:
 
@@ -131,6 +142,6 @@ As a last step do the following in Anki:
 - make sure to set the importer's options like so:
   ![](readme_imgs/anki_importer_options.png)
 
-- Click `Import`
+- click `Import`
 
 Time to start studying!
