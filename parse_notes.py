@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 import markdown
 import htmlmin
 from bs4 import BeautifulSoup
@@ -9,13 +10,18 @@ import re
 import time
 
 # Anki's library folder
-ANKI_LIB_DIR='/home/xy/.local/share/Anki2/User\ 1/collection.media'
+# ANKI_LIB_DIR='${HOME}/.local/share/Anki2/User\ 1/collection.media'
+ANKI_LIB_DIR='${HOME}/Library/Application\ Support/Anki2/User\ 1/collection.media'
 
 # Image folder location
 IMG_DIR='/img/'
 
 # HTML folder location
 HTML_DIR='/html/'
+
+# Define constants to signal begin and end of a question
+BEGINN_QUESTION = 'h3'
+END_QUESTION = '%eq'
 
 # HANDLE ARGUMENTS
 # print('Number of arguments:', len(sys.argv), 'arguments.')
@@ -27,10 +33,6 @@ export_file= HTML_DIR + input_file.split('.')[0] + '.html'
 # Name input and output files
 md_input= file_path + '/' + input_file
 html_output= file_path + '/' + export_file
-
-# Define constants to signal begin and end of a question 
-BEGINN_QUESTION = 'h3'
-END_QUESTION = '%eq'
 
 # Count questions
 question_count = 0
@@ -137,12 +139,12 @@ for begin_tag in begin_tags:
       loop_variable = loop_variable.find_next_sibling()
     else:
       loop_variable = loop_variable.find_next_sibling()
-  
+
   if (not is_end_tag):
     begin_tag.insert_after('"\t"')
     # Increment no of questions
     question_count += 1
-  
+
   is_end_tag = False
 
 end_tags = soup.find_all('p', string=END_QUESTION)
@@ -217,7 +219,8 @@ print('#########################')
 
 # Backup Anki
 # backup_folder = current_date() + '-' + current_time() + '-Anki'
-# os.system('mkdir /Users/jep/backups/anki/' + backup_folder + '&& cp -r /Users/jep/Library/Application\ Support/Anki2/ /Users/jep/backups/anki/' + backup_folder )
+# os.system('mkdir /Users/xy/backups/anki/' + backup_folder + '&& cp -r
+# /Users/xy/Library/Application\ Support/Anki2/ /Users/xy/backups/anki/' + backup_folder )
 
 
 
